@@ -54,14 +54,10 @@ func printUsage() {
 func changeBrightness(amount int, op intOperation) {
 	f, err := os.OpenFile(fmt.Sprintf("%s/brightness", BASE_PATH), os.O_RDWR|os.O_TRUNC, 0755)
 	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
+	checkPanic(err)
 
 	prev, err := strconv.Atoi(strings.TrimSuffix(string(getCurrentBrightness()), "\n"))
-	if err != nil {
-		panic(err)
-	}
+	checkPanic(err)
 
 	diff := op(prev, amount)
 
@@ -79,32 +75,30 @@ func changeBrightness(amount int, op intOperation) {
 	fmt.Printf("br: %s\n", br)
 
 	_, err = f.Write(br)
-	if err != nil {
-		panic(err)
-	}
+	checkPanic(err)
 }
 
 func getCurrentBrightness() []byte {
 	data, err := os.ReadFile(fmt.Sprintf("%s/brightness", BASE_PATH))
-	if err != nil {
-		panic(err)
-	}
+	checkPanic(err)
 
 	return data
 }
 
 func getMaxBrightness() int {
 	data, err := os.ReadFile(fmt.Sprintf("%s/max_brightness", BASE_PATH))
-	if err != nil {
-		panic(err)
-	}
+	checkPanic(err)
 
 	i, err := strconv.Atoi(strings.TrimSuffix(string(data), "\n"))
+	checkPanic(err)
+
+	return i
+}
+
+func checkPanic(err error) {
 	if err != nil {
 		panic(err)
 	}
-
-	return i
 }
 
 // Go requires me to do this crap sometimes...
