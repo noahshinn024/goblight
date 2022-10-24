@@ -3,23 +3,34 @@ package main
 import (
 	"fmt"
 	"os"
+  "os/exec"
 	"strconv"
 	"strings"
+  "math"
 )
 
 const (
-	DRIVER    = "acpi_video0" // check your driver by running 'ls /sys/class/backlight'
-	BASE_PATH = "/sys/class/backlight/" + DRIVER
+  DRIVER = "intel_backlight" // check your driver by running 'ls /sys/class/backlight'
+  BASE_PATH = "/sys/class/backlight/" + DRIVER
+  LOWER_BOUND = 0.001 // lowest possible percentage of max brightness
 )
 
 // Since this program is supposed to run as root with SUID, i decided it would be the
 // best to panic at every error, for security reasons.
 
 var MAX_BRIGHTNESS int = getMaxBrightness()
+var MIN_BRIGHTNESS int = int(math.Ceil(float64(MAX_BRIGHTNESS) * LOWER_BOUND))
 
 func main() {
 	handleArg(os.Args)
 }
+
+func getDriver() string {
+  cmd := exec.Command("ls", "/sys/class/backlight")
+  stdout, err := cmd.Output()
+  checkPanic(err)
+  return string(stdout[:])
+} 
 
 func handleArg(arg []string) {
 	if len(arg) != 2 {
@@ -65,8 +76,8 @@ func changeBrightness(amount int, op intOperation) {
 
 	if diff >= MAX_BRIGHTNESS {
 		br = []byte(fmt.Sprint(MAX_BRIGHTNESS))
-	} else if diff <= 0 {
-		br = []byte("0")
+	} else if diff <= MIN_BRIGHTNESS {
+		br = []byte(strconv.Itoa(MIN_BRIGHTNESS))
 	} else {
 		br = []byte(fmt.Sprint(diff))
 	}
