@@ -82,9 +82,6 @@ func changeBrightness(amount int, op intOperation) {
 		br = []byte(fmt.Sprint(diff))
 	}
 
-	fmt.Printf("diff: %d\n", diff)
-	fmt.Printf("br: %s\n", br)
-
 	_, err = f.Write(br)
 	checkPanic(err)
 }
