@@ -10,7 +10,7 @@ import (
 )
 
 const (
-  DRIVER = "intel_backlight" // check your driver by running 'ls /sys/class/backlight'
+  DRIVER = "acpi_video0" // check your driver by running 'ls /sys/class/backlight'
   BASE_PATH = "/sys/class/backlight/" + DRIVER
   LOWER_BOUND = 0.001 // lowest possible percentage of max brightness
 )
